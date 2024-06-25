@@ -6,6 +6,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 try:
     from Cython.Build import cythonize
+    from Cython.Compiler import Options
 except ImportError:
     use_cython = False
     ext = 'c'
@@ -57,6 +58,11 @@ else:
             Extension("pomegranate.*", ["pomegranate/*.pyx"]),
 	        Extension("pomegranate.distributions.*", ["pomegranate/distributions/*.pyx"])
     ]
+
+    # This ensures the generated C code is reproducible. Without it, doc comments with pointers to
+    # files in a temporary build directory with a random name are included, defeating
+    # reproducibility.
+    Options.embed_pos_in_docstring = False
 
     extensions = cythonize(extensions, compiler_directives={'language_level' : "2"})
 
